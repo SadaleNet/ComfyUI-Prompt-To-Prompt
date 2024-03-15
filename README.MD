@@ -4,7 +4,7 @@ This is a PoC port of [Google's Prompt-to-Prompt](https://github.com/google/prom
 
 ![A teaser image showcasing what this repository does](teaser.png)
 
-All of the images above can be found in the sample_output folder. They can be reproduced by loading them as ComfyUI as workflow.
+All of the images above can be found in the sample_output folder. They can be reproduced by loading them into ComfyUI as workflow.
 
 ## Quick Start
 
@@ -42,18 +42,16 @@ Purpose: To perform the modification of the prompt, the two prompts has to be sp
 
 Purpose: Narrow down the part of the image to be edited. For example, if we want to have Prompt 1 of `cat in a city` and Prompt 2 of `dog in a city`, we would want to limit the change to the cat/dog alone with no change made to the image background. It's empirically found that this feature performs better in SD1.5 than in SDXL. This feature can be disabled by using empty string for `local_blend` and `local_blend2`.
 
-Limitation: Can only specify one phrase per prompt.
-
-* CLIPTextEncoderPromptToPropmt.local_blend / local_blend2: The phrase for generating the mask of `text` / `text2`. If there's multiple matches for the phrase in the `text` / `text2`, only the first match is taken. The mask used is the union of `local_blend` and `local_blend2`. If `local_blend` and `local_blend2` is an empty string, the mask corresponding to the `text` / `text2` would not be generated.
+* CLIPTextEncoderPromptToPropmt.local_blend / local_blend2: The phrase for generating the mask of `text` / `text2`. If there's multiple matches for the phrase in the `text` / `text2`, only the first match is taken. The mask used is the union of `local_blend` and `local_blend2`. If `local_blend` / `local_blend2` is an empty string, the mask corresponding to the `text` / `text2` would not be generated.
 * KSamplerPromptToPrompt.local_blend_layers: The U-Net layers used for generating the mask. Usage of the `LocalBlendLayerPresetPromptToPrompt` node for generating the required string is recommended. SD1.5 and SDXL requires different layers. The exact layer required can be analyzed by using the `KSamplerPromptToPromptAttentionMapLogger` node.
 * KSamplerPromptToPrompt.local_blend_threshold: The higher the threshold, the less content the mask would match, and the more focused the editing would be. A sensible value would be between 0.3 and 0.9. Apparently SDXL requires higher local_blend_threshold than SD1.5.
 
 ### Reweight
 
-Purpose: Either put more emphasis or less emphasis on the specified phrase. Negative value means removal of concept. This feature can be disabled by using empty string for `reweight_words`. The effect of reweight starts after `cross_attention_step`. To bypass this feature, put empty string to `reweight_words`.
+Purpose: Either put more emphasis or less emphasis on the specified phrase. This feature can be disabled by using empty string for `reweight_words`. The effect of reweight starts after `cross_attention_step`. To bypass this feature, put empty string to `reweight_words`.
 
 * CLIPTextEncoderPromptToPropmt.reweight_words: The target phrase subjected to weight modification. This phrase is matched against `text2`. If there's multiple matches, only the first match is taken.
-* CLIPTextEncoderPromptToPropmt.reweight_value: The amount of emphasis to put into the target phrase. A sensible value is somewhere between -10.0 and 10.0, with lower value means lower emphasis.
+* CLIPTextEncoderPromptToPropmt.reweight_value: The amount of emphasis to put into the target phrase. A sensible value is somewhere between -10.0 and 10.0, with lower value means lower emphasis. Apparently, negative value can be used for removing the emphasis.
 
 ### Cross-attention Map Inspection
 
