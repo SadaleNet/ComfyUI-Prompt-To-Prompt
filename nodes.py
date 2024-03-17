@@ -351,7 +351,8 @@ class KSamplerPromptToPrompt:
     CATEGORY = "sampling"
 
     def sample(self, model, seed, steps, cfg, sampler_name, scheduler, positive_p2p, negative, self_attention_step, cross_attention_step, local_blend_threshold, local_blend_layers, latent_image, preview, denoise=1.0):
-        return dual_ksampler(self, model, seed, steps, cfg, sampler_name, scheduler, positive_p2p, negative, latent_image, self_attention_step, cross_attention_step, local_blend_threshold, local_blend_layers, preview == "enabled", denoise=denoise)
+        m = model.clone()
+        return dual_ksampler(self, m, seed, steps, cfg, sampler_name, scheduler, positive_p2p, negative, latent_image, self_attention_step, cross_attention_step, local_blend_threshold, local_blend_layers, preview == "enabled", denoise=denoise)
 
 class KSamplerPromptToPromptAttentionMapLogger:
     @classmethod
