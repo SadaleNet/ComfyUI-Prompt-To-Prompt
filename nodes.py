@@ -381,18 +381,19 @@ class KSamplerPromptToPromptAttentionMapLogger:
         self.output_dir = folder_paths.get_temp_directory()
 
     def sample(self, model, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent_image, denoise, output_name):
+        m = model.clone()
         output_prefix = os.path.join(self.output_dir, f"attn_{output_name.replace('/', '')}")
         if os.path.exists(output_prefix):
             shutil.rmtree(output_prefix)
         os.makedirs(output_prefix, exist_ok=True)
 
         attn2_storage = Attn2SimStorage()
-        key_list = search_transformer_blocks(model)
+        key_list = search_transformer_blocks(m)
         for i in key_list:
-            model.set_model_attn2_replace(
+            m.set_model_attn2_replace(
                 functools.partial(process_attn2, sim_storage=attn2_storage, sim_storage_key_list=None, out_storage=None, sim_replace=None, replacement_mapper=None, reweight_map=None, refinement_sim=None), i[0], i[1], i[2]
             )
 
-        ret = nodes.common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent_image, denoise=denoise)
+        ret = nodes.common_ksampler(m, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent_image, denoise=denoise)
         output_attn2_map(attn2_storage, latent_image["samples"].shape[2:], key_list, output_prefix)
         return ret
